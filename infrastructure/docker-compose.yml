@@ -52,7 +52,7 @@ services:
   task-worker:
     build:
       context: ..
-      dockerfile: task-worker/Dockerfile
+      dockerfile: task-worker/Dockerfile  
     container_name: task-worker
     restart: always
     depends_on:
