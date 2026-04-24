@@ -1,0 +1,69 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: task-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: task-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  redis:
+    image: redis:7
+    container_name: task-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+  task-api:
+    build: ../task-api
+    container_name: task-api
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    environment:
+      DB_HOST: postgres
+      DB_NAME: taskdb
+      DB_USER: taskuser
+      DB_PASSWORD: taskpass
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      REDIS_HOST: redis
+    ports:
+      - "8080:8080"
+
+  task-worker:
+    build: ../task-worker
+    container_name: task-worker
+    restart: always
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+    environment:
+      DB_HOST: postgres
+      DB_NAME: taskdb
+      DB_USER: taskuser
+      DB_PASSWORD: taskpass
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      REDIS_HOST: redis
+
+volumes:
+  postgres_data:
