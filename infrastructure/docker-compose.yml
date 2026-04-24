@@ -27,43 +27,47 @@ services:
     ports:
       - "6379:6379"
 
-  task-api:
-    build: ../task-api
-    container_name: task-api
-    restart: always
-    depends_on:
-      - postgres
-      - rabbitmq
-      - redis
-    environment:
-      DB_HOST: postgres
-      DB_NAME: taskdb
-      DB_USER: taskuser
-      DB_PASSWORD: taskpass
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_USER: guest
-      RABBITMQ_PASSWORD: guest
-      REDIS_HOST: redis
-    ports:
-      - "8080:8080"
+task-api:
+  build:
+    context: ..
+    dockerfile: task-api/Dockerfile
+  container_name: task-api
+  restart: always
+  depends_on:
+    - postgres
+    - rabbitmq
+    - redis
+  environment:
+    DB_HOST: postgres
+    DB_NAME: taskdb
+    DB_USER: taskuser
+    DB_PASSWORD: taskpass
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_USER: guest
+    RABBITMQ_PASSWORD: guest
+    REDIS_HOST: redis
+  ports:
+    - "8080:8080"
 
-  task-worker:
-    build: ../task-worker
-    container_name: task-worker
-    restart: always
-    depends_on:
-      - postgres
-      - rabbitmq
-      - redis
-    environment:
-      DB_HOST: postgres
-      DB_NAME: taskdb
-      DB_USER: taskuser
-      DB_PASSWORD: taskpass
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_USER: guest
-      RABBITMQ_PASSWORD: guest
-      REDIS_HOST: redis
-
+task-worker:
+  build:
+    context: ..
+    dockerfile: task-worker/Dockerfile
+  container_name: task-worker
+  restart: always
+  depends_on:
+    - postgres
+    - rabbitmq
+    - redis
+  environment:
+    DB_HOST: postgres
+    DB_NAME: taskdb
+    DB_USER: taskuser
+    DB_PASSWORD: taskpass
+    RABBITMQ_HOST: rabbitmq
+    RABBITMQ_USER: guest
+    RABBITMQ_PASSWORD: guest
+    REDIS_HOST: redis
+    
 volumes:
   postgres_data:
